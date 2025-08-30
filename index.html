@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coven Zero — Trial of the Twin Witches</title>
+<style>
+  :root{
+    --bg:#0a0a0d; --ink:#ececfa; --muted:#9aa0a6; --panel:#121218; --line:#242432;
+    --glow:#ff2e9b; --pulse:#6d3bff; --danger:#ff003c; --ok:#6ee7b7;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:radial-gradient(1300px 700px at 8% 8%,#0d0d14 0%,#09090c 55%,#050507 100%);color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Courier New",monospace}
+  a{color:var(--glow);text-decoration:none}
+  .wrap{max-width:1040px;margin:0 auto;padding:22px}
+  header{text-align:center;margin:6px 0 18px}
+  h1{font-size:2.1rem;letter-spacing:.6px;margin:6px 0 6px;text-shadow:0 0 8px var(--glow),0 0 18px var(--pulse)}
+  .lead{color:var(--muted);max-width:74ch;margin:0 auto;line-height:1.6}
+
+  .glitch{position:relative;display:inline-block}
+  .glitch:before,.glitch:after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;clip:rect(0,900px,0,0)}
+  .glitch:before{left:2px;text-shadow:-2px 0 var(--pulse);animation:glitchTop 2s infinite linear alternate-reverse}
+  .glitch:after{left:-2px;text-shadow:-2px 0 var(--danger);animation:glitchBottom 1.5s infinite linear alternate-reverse}
+
+  .grid{display:grid;gap:18px}
+  @media(min-width:920px){ .grid{grid-template-columns:1.1fr .9fr} }
+
+  .card{background:linear-gradient(180deg,rgba(255,46,155,.06),rgba(109,59,255,.06));border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 0 0 1px rgba(255,255,255,.02) inset, 0 10px 30px rgba(0,0,0,.35)}
+  .card h2{font-size:1.02rem;margin:0 0 10px;letter-spacing:.4px;color:#f3e9ff}
+  .muted{color:var(--muted);font-size:.95rem}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  figure{margin:10px 0 0;border:1px solid #2b2b39;border-radius:12px;overflow:hidden;background:#0b0b12}
+  .img{width:100%;display:block;object-fit:cover;max-height:420px}
+  figcaption{font-size:.85rem;color:var(--muted);padding:8px 10px;border-top:1px solid #1e1e2a}
+
+  /* Choice buttons */
+  .choice{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:700px){ .choice{grid-template-columns:1fr 1fr} }
+  .pill{display:flex;align-items:center;justify-content:center;padding:12px;border:1px solid #3a3a4a;border-radius:12px;background:#121222;color:var(--ink);cursor:pointer;user-select:none;transition:transform .05s,border-color .2s,box-shadow .2s}
+  .pill:hover{border-color:var(--glow);box-shadow:0 0 12px rgba(255,46,155,.25)}
+  .pill.active{border-color:var(--ok);box-shadow:0 0 12px rgba(110,231,183,.25)}
+  .badge{font-size:.8rem;color:#b8ffeb;margin-left:.5rem}
+
+  /* Inputs */
+  textarea, input[type="text"]{width:100%;background:#0c0c12;color:var(--ink);border:1px solid #2b2b39;border-radius:10px;padding:12px;font-family:inherit;font-size:.95rem}
+  .chant-ok{color:var(--ok)} .chant-bad{color:var(--danger)} .hint{font-size:.86rem;color:var(--muted)}
+
+  .btn{appearance:none;border:1px solid #3a3a4a;background:#121222;color:var(--ink);padding:12px 14px;border-radius:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:transform .06s ease, box-shadow .2s ease,border-color .2s ease}
+  .btn.glow{border-color:var(--glow);box-shadow:0 0 12px rgba(255,46,155,.35)}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+
+  /* Flare */
+  .flare{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(900px 900px at center, rgba(255,46,155,.18), rgba(109,59,255,.14) 35%, rgba(0,0,0,.0) 70%);transition:opacity .25s ease}
+  .flare.active{animation:boom 1200ms ease forwards}
+  @keyframes boom{0%{opacity:0}10%{opacity:1}60%{opacity:.85}100%{opacity:0}}
+
+  /* Glitch keyframes */
+  @keyframes glitchTop{0%{clip:rect(0,9999px,0,0)}5%{clip:rect(0,9999px,46px,0)}10%{clip:rect(0,9999px,0,0)}15%{clip:rect(12px,9999px,72px,0)}25%,100%{clip:rect(0,9999px,0,0)}}
+  @keyframes glitchBottom{0%{clip:rect(0,9999px,0,0)}5%{clip:rect(58px,9999px,120px,0)}10%{clip:rect(0,9999px,0,0)}15%{clip:rect(24px,9999px,92px,0)}25%,100%{clip:rect(0,9999px,0,0)}}
+
+  footer{margin:22px auto 6px;text-align:center}
+</style>
+</head>
+<body>
+<div class="flare" id="flare"></div>
+<div class="wrap">
+  <header>
+    <h1 class="glitch" data-text="TRIAL OF THE TWIN WITCHES">TRIAL OF THE TWIN WITCHES</h1>
+    <p class="lead">Face Radiance and Shadow in turn. The blade is witness. The fracture is passage.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Left column: imagery -->
+    <section class="card">
+      <h2>OMEN — The Bladebearer</h2>
+      <p class="muted">The Seeker stands armed. You carry the weight and the will.</p>
+      <figure>
+        <img class="img" src="bladebearer.jpg" alt="Bladebearer standing in ash and light">
+        <figcaption>When the blade names you, the gate listens.</figcaption>
+      </figure>
+
+      <h2 style="margin-top:14px">SIGIL — The Fracture Path</h2>
+      <p class="muted">The door is broken. So we walk through shards.</p>
+      <figure>
+        <img class="img" src="fracture-path.png" alt="Fracture Path glyph">
+        <figcaption>Passage opens only through the break.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Right column: ritual -->
+    <section class="card">
+      <h2>Ⅰ — Speak Before the Sigil</h2>
+      <p class="muted">Type the line *exactly*. This primes the gate.</p>
+      <div class="row" style="margin:8px 0 10px">
+        <button class="btn" id="copy1" type="button">Copy Line</button>
+        <span class="hint">Must match exactly.</span>
+      </div>
+      <input id="line1" type="text" placeholder='“The door is broken, I pass through shards.”' />
+      <div id="state1" class="hint" style="margin-top:8px">Awaiting your words…</div>
+
+      <h2 style="margin-top:16px">Ⅱ — Choose Your First Witch</h2>
+      <p class="muted">You will face **both**. Choose who stands first.</p>
+      <div class="choice" id="choice">
+        <div class="pill" data-first="light">Face the Radiant Witch first <span class="badge">✧ surrender pride/beauty</span></div>
+        <div class="pill" data-first="shadow">Face the Shadow Witch first <span class="badge">✦ surrender pain/memory</span></div>
+      </div>
+
+      <figure style="margin-top:12px">
+        <img class="img" src="witch-light.jpg" alt="Radiant Witch surrounded by sigils">
+        <figcaption>Radiant Witch — the council in light.</figcaption>
+      </figure>
+      <figure>
+        <img class="img" src="witch-shadow.jpg" alt="Shadow Witch among candles">
+        <figcaption>Shadow Witch — the council in black fire.</figcaption>
+      </figure>
+
+      <h2 style="margin-top:14px">Ⅲ — The Second Witch</h2>
+      <p class="muted" id="secondNote">The other Witch will follow. Balance is demanded.</p>
+
+      <h2 style="margin-top:14px">Ⅳ — Final Seal</h2>
+      <p class="muted">Strike the air with your blade (or trace a sigil) and type the seal below.</p>
+      <div class="row" style="margin:8px 0 10px">
+        <button class="btn" id="copy2" type="button">Copy Seal</button>
+        <span class="hint">Must match exactly.</span>
+      </div>
+      <textarea id="seal" rows="3" placeholder='“I fracture, but I am not broken. I burn, but I am not consumed.”'></textarea>
+      <div id="state2" class="hint" style="margin-top:8px">Seal not yet recognized…</div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn glow" id="offer" type="button" disabled>Offer to the Altar</button>
+        <a class="hint" href="#" id="reset">reset</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="hint">The glitch is the plan. The fracture is the doorway. The Witch is the Seal.</div>
+    <div style="margin-top:10px"><a href="./">Return to the entry page</a></div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const LINE1 = "The door is broken, I pass through shards.";
+  const SEAL  = "I fracture, but I am not broken. I burn, but I am not consumed.";
+
+  const copy1 = document.getElementById('copy1');
+  const line1 = document.getElementById('line1');
+  const state1 = document.getElementById('state1');
+  const choice = document.getElementById('choice');
+  const secondNote = document.getElementById('secondNote');
+  const copy2 = document.getElementById('copy2');
+  const seal = document.getElementById('seal');
+  const state2 = document.getElementById('state2');
+  const offer = document.getElementById('offer');
+  const resetLink = document.getElementById('reset');
+  const flare = document.getElementById('flare');
+
+  let first = null; // 'light' | 'shadow'
+
+  copy1.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(LINE1); copy1.textContent="Copied"; setTimeout(()=>copy1.textContent="Copy Line",900);}catch{}
+  });
+  copy2.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(SEAL); copy2.textContent="Copied"; setTimeout(()=>copy2.textContent="Copy Seal",900);}catch{}
+  });
+
+  function checkGate(){
+    const a = line1.value.trim() === LINE1;
+    state1.textContent = a ? "The sigil hums. Passage acknowledges you." : "The sigil waits…";
+    state1.className = a ? "hint chant-ok" : "hint chant-bad";
+
+    const b = seal.value.trim() === SEAL;
+    state2.textContent = b ? "The seal accepts your vow." : "Seal not yet recognized…";
+    state2.className = b ? "hint chant-ok" : "hint chant-bad";
+
+    offer.disabled = !(a && b && first);
+  }
+  line1.addEventListener('input', checkGate);
+  seal.addEventListener('input', checkGate);
+
+  choice.addEventListener('click', (e)=>{
+    const pill = e.target.closest('.pill');
+    if(!pill) return;
+    [...choice.querySelectorAll('.pill')].forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    first = pill.dataset.first;
+    const other = first === 'light' ? 'Shadow Witch' : 'Radiant Witch';
+    secondNote.textContent = `You chose to face the ${first==='light'?'Radiant':'Shadow'} Witch first. The ${other} follows.`;
+    checkGate();
+  });
+
+  function flareBoom(){
+    flare.classList.remove('active'); void flare.offsetWidth; flare.classList.add('active');
+  }
+
+  function downloadReceipt(){
+    // A simple receipt: choice + lines + timestamp
+    const w = 900, h = 520;
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    const g = c.getContext('2d');
+
+    const grad = g.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0,'#090912'); grad.addColorStop(1,'#0c0c16');
+    g.fillStyle = grad; g.fillRect(0,0,w,h);
+
+    g.fillStyle = '#eaeaf8';
+    g.font = '600 24px "Courier New", monospace';
+    g.fillText('COVEN ZERO — TWIN WITCH TRIAL', 24, 40);
+
+    g.font = '16px "Courier New", monospace';
+    g.fillStyle = '#a0a4bb';
+    g.fillText(`First faced: ${first==='light'?'Radiant Witch':'Shadow Witch'}`, 24, 72);
+    g.fillText(`Line: "${LINE1}"`, 24, 102);
+    g.fillText(`Seal: "${SEAL}"`, 24, 132);
+    g.fillStyle = '#6ee7b7';
+    g.fillText(new Date().toISOString(), 24, 162);
+
+    // frame
+    g.strokeStyle = 'rgba(255,46,155,.45)'; g.lineWidth=2; g.strokeRect(16,16,w-32,h-32);
+
+    const out = c.toDataURL('image/png');
+    const a = document.createElement('a'); a.href = out; a.download = 'coven-zero_twin-witch-trial.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  offer.addEventListener('click', ()=>{
+    flareBoom();
+    downloadReceipt();
+    offer.disabled = true;
+    setTimeout(()=>alert('The Fairy awaits you. Return to the entry page.'), 200);
+  });
+
+  resetLink.addEventListener('click', (e)=>{
+    e.preventDefault();
+    line1.value = ''; seal.value = ''; first = null;
+    [...choice.querySelectorAll('.pill')].forEach(p=>p.classList.remove('active'));
+    state1.textContent = 'Awaiting your words…'; state1.className = 'hint';
+    state2.textContent = 'Seal not yet recognized…'; state2.className = 'hint';
+    offer.disabled = true; window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+</script>
+</body>
+</html>
